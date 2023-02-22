@@ -7,6 +7,7 @@
       playerLife: 100,
       enemyLife: 100,
       running: true,
+      log: [],
     },
     computed: {
       
@@ -26,23 +27,26 @@
     estado.data.playerLife = 100
     estado.data.enemyLife = 100
     console.log('Clicou')
+    estado.data.log - []
   }
 
   const attack = (especial) => {
-    hurt( 7, 12, false)
-    hurtEnemy (5, 10, especial)
+    hurt( 7, 12, false, 'Inimigo', 'Jogador', 'enemy')
+    hurtEnemy (5, 10, especial , 'Jogador', 'inimigo', 'player' )
   }
 
-  const hurt = ( min, max, especial) => {
+  const hurt = ( min, max, especial, source, target, cls) => {
     const plus = especial ? 5 : 0
     const hurt = randomPower(min + plus, max + plus)
     estado.data.playerLife = Math.max(estado.data.playerLife - hurt , 0)
+    logRegister(`${source} atingiu ${target} com ${hurt}.`, cls)
   }
 
-  const hurtEnemy = ( min, max, especial) => {
+  const hurtEnemy = ( min, max, especial, source, target, cls) => {
     const plus = especial ? 5 : 0
     const hurt = randomPower(min + plus, max + plus)
     estado.data.enemyLife = Math.max(estado.data.enemyLife - hurt , 0)
+    logRegister(`${source} atingiu ${target} com ${hurt}.`, cls)
   }
 
   const randomPower = (min, max) => {
@@ -56,6 +60,11 @@
     } else {
       estado.data.playerLife += 0
     }
+    logRegister("Jogador se curou em 10% de vida perdida", 'player')
+  }
+
+  const logRegister = (text, cls) => {
+    estado.data.log.unshift({text , cls})
   }
 </script>
 
@@ -94,8 +103,12 @@
         </template>
         <button v-else @click="start()" class="btn newGame">Iniciar</button>
       </div>
-      <div class="panel logs">
-  
+      <div v-if="estado.data.log.length" class="panel logs">
+        <ul>
+          <li v-for="logs in estado.data.log" :class="logs.cls" class="log">
+            {{ logs.text }}
+          </li>
+        </ul>  
       </div>
     </div>
 </template>
@@ -200,6 +213,34 @@
   .attack{
     background-color: rgb(190, 47, 47);
     color: white;
+  }
+
+  .logs ul{
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .logs ul li{
+    display: flex;
+    justify-content: center;
+    margin: 4px 0px;
+    padding: 3px 0px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    color: white;
+    border-radius: 3px;
+  }
+
+  .player{
+    background-color: #4253afaa;
+  }
+
+  .enemy{
+    background-color: #e51c23aa;
   }
 
 
